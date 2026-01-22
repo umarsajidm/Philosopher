@@ -12,6 +12,7 @@ typedef struct s_data{
     int time_to_sleep;
     int no_of_times_each_philo_must_eat;
     int someone_die;
+    pthread_mutex_t *fork;
 }   t_data;
 
 typedef struct s_philo{
@@ -50,25 +51,29 @@ void ft_usleep(long long time_in_ms)
     printf("executed");
 }
 
-void init_data(t_philo *philos, t_data *data)
+void init_data(t_data *data, int ac, char **av)
 {
-    // Write the loop here
-    // Assign ID
-    // Assign Left Fork pointer
-    // Assign Right Fork pointer (Use the % formula!)
-    // Assign data pointer
+    data->no_of_philo = ft_atoi(av[1]);
+    data->time_to_die = ft_atoi(av[2]);
+    data->time_to_eat = ft_atoi(av[3]);
+    data->time_to_sleep = ft_atoi(av[4]);
+    data->no_of_times_each_philo_must_eat = -1;
+    if (ac == 6)
+        data->no_of_times_each_philo_must_eat = ft_atoi(av[5]);
+    data->someone_die = 0;
+    data->fork = malloc(sizeof(pthread_mutex_t)*data->no_of_philo);
 }
-
-
 void init_philos(t_philo *philo, t_data *data)
 {
     int i = 0;
-    while (data->no_of_philo > 0)
+    int n = data->no_of_philo;
+    while (n > 0)
     {
         philo->id == i++;
         philo->left_mutex == fork[i];
         philo->right_mutex == fork[(i + 1) % data->no_of_philo];
         philo->s_data = data;
+        n--;
     }
 }
 
@@ -79,9 +84,7 @@ int main(int ac, char **av)
 
     gettimeofday(&tv, NULL);
 
-    long long millisecond = (long long)tv.tv_sec * 1000 + (long long)tv.tv_usec/1000;
-
-    ft_usleep(millisecond);
+    ft_usleep(600);
 
     return 0;
 }
