@@ -49,36 +49,17 @@ void time_to_eat(t_data *data, t_philo *philo)
     
     while (1)
     {
-        if (pthread_mutex_lock(philo->left_mutex) != 0)
-        {
-            printf("locking failed");
-               return ;
-        }
-
+        pthread_mutex_lock(philo->left_mutex);
         print_action(philo, "philo is taking a fork");
         
-        if (pthread_mutex_lock(philo->right_mutex) != 0)
-        {
-            printf("locking failed");
-            return ;
-        }
-
+        pthread_mutex_lock(philo->right_mutex);
         print_action(philo, "philo is eating");
 
         philo->last_meal_time = gettimeoftheday();
         ft_usleep(data->time_to_eat);
         
-        if (pthread_mutex_unlock(philo->left_mutex) != 0)
-        {
-            printf("locking failed");
-            return ;
-        }
-        if (pthread_mutex_unlock(philo->right_mutex) != 0)
-        {
-            printf("locking failed");
-            return ;
-        }
-        
+        pthread_mutex_unlock(philo->left_mutex);
+        pthread_mutex_unlock(philo->right_mutex);
         print_action(philo, "philo is sleeping");
         
         ft_usleep(data->time_to_sleep);
