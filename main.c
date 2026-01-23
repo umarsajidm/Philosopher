@@ -53,6 +53,7 @@ void ft_usleep(long long time_in_ms)
 
 void init_data(t_data *data, int ac, char **av)
 {
+    int i = 0;
     data->no_of_philo = ft_atoi(av[1]);
     data->time_to_die = ft_atoi(av[2]);
     data->time_to_eat = ft_atoi(av[3]);
@@ -62,18 +63,23 @@ void init_data(t_data *data, int ac, char **av)
         data->no_of_times_each_philo_must_eat = ft_atoi(av[5]);
     data->someone_die = 0;
     data->fork = malloc(sizeof(pthread_mutex_t)*data->no_of_philo);
+    if (!data->fork)
+        return ;
+    while (i < data->no_of_philo)
+    {
+        pthread_mutex_init(&data->fork[i], NULL);
+        i++;
+    }
 }
 void init_philos(t_philo *philo, t_data *data)
 {
     int i = 0;
-    int n = data->no_of_philo;
-    while (n > 0)
+    while (i < data->no_of_philo)
     {
-        philo->id == i++;
-        philo->left_mutex == fork[i];
-        philo->right_mutex == fork[(i + 1) % data->no_of_philo];
-        philo->s_data = data;
-        n--;
+        philo[i]->id = i++;
+        philo[i]->left_mutex = data->fork[i];
+        philo[i]->right_mutex = data->fork[(i + 1) % data->no_of_philo];
+        philo[i]->s_data = data;
     }
 }
 
