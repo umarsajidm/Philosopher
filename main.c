@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
+int ft_atoi(const char *str);
+
 typedef struct s_data{
 
     int no_of_philo;
@@ -71,26 +73,53 @@ void init_data(t_data *data, int ac, char **av)
         i++;
     }
 }
+
 void init_philos(t_philo *philo, t_data *data)
 {
     int i = 0;
     while (i < data->no_of_philo)
     {
-        philo[i]->id = i++;
-        philo[i]->left_mutex = data->fork[i];
-        philo[i]->right_mutex = data->fork[(i + 1) % data->no_of_philo];
-        philo[i]->s_data = data;
+        philo[i].id = i + 1;
+        philo[i].left_mutex = &data->fork[i];
+        philo[i].right_mutex = &data->fork[(i + 1) % data->no_of_philo];
+        philo[i].data = data;
+        i++;
     }
 }
 
+void *thread_routine_funtion(void *arg)
+{
+    t_philo *my_philo_data;
+    
+    my_philo_data = (t_philo *)arg;
+    printf("i am philosopher number %i\n", my_philo_data->id);
+    return NULL;
+}
 
 int main(int ac, char **av)
 {
-    struct timeval tv;
+    t_data  *data;
+    t_philo *philo;
+    int     i = 0;
 
-    gettimeofday(&tv, NULL);
-
-    ft_usleep(600);
-
+    data = malloc(sizeof(t_data));
+    if (!data)
+        return(printf("data allocation failed"), 1);
+    init_data(data, ac, av);
+    philo =  malloc(sizeof(t_philo) * data->no_of_philo);
+    if (!philo)
+        return(printf("philo allocation failed"));
+    init_philos(philo, data);
+    while (data->no_of_philo > i)
+    {
+        if (pthread_create(&philo[i].tid, NULL, thread_routine_funtion, &philo[i]))
+            return(printf("threading failed"), 1);
+        i++;
+    }
+    i = 0;
+    while(data->no_of_philo > i)
+    {
+        pthread_join(philo[i++].tid, NULL);
+    }
     return 0;
 }
