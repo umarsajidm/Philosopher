@@ -88,12 +88,18 @@ void init_philos(t_philo *philo, t_data *data)
     }
 }
 
+void print_action(t_philo *philo, char *str)
+{
+    long long time;
+
+    time = gettimeoftheday() - philo->data->start_time;
+    printf("%lld %i %s\n", time, philo->id, str);
+}
+
 void time_to_eat(t_data *data, t_philo *philo)
 {
     int i = 0;
-    long long time;
-
-    time = gettimeoftheday() - data->start_time;
+    
     while (1)
     {
         if (pthread_mutex_lock(philo->left_mutex) != 0)
@@ -102,7 +108,7 @@ void time_to_eat(t_data *data, t_philo *philo)
                return ;
         }
 
-        printf("%lld %i philo has taken the fork\n", gettimeoftheday() - data->start_time, philo->id);
+        print_action(philo, "philo is taking a fork");
         
         if (pthread_mutex_lock(philo->right_mutex) != 0)
         {
@@ -110,7 +116,8 @@ void time_to_eat(t_data *data, t_philo *philo)
             return ;
         }
 
-        printf("%lld %i philo is eating\n", gettimeoftheday() - data->start_time,  philo->id);
+        print_action(philo, "philo is eating");
+
         philo->last_meal_time = gettimeoftheday();
         ft_usleep(data->time_to_eat);
         
@@ -125,11 +132,11 @@ void time_to_eat(t_data *data, t_philo *philo)
             return ;
         }
         
-        printf("%lld %i philo is sleeping\n", gettimeoftheday() - data->start_time,  philo->id);
+        print_action(philo, "philo is sleeping");
         
         ft_usleep(data->time_to_sleep);
 
-        printf("%lld %i philo is thinking\n", gettimeoftheday() - data->start_time,  philo->id);
+        print_action(philo, "philo is thinking");
     }
 }
 
