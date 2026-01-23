@@ -50,7 +50,3 @@ void ft_usleep(long long time_in_ms)
     }
 }
 
-void monitor()
-{
-    
-}

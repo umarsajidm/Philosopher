@@ -80,6 +80,16 @@ void *thread_routine_funtion(void *arg)
     return NULL;
 }
 
+void monitor(t_philo *philo)
+{
+    long long time_since_last_meal;
+
+    time_since_last_meal = gettimeoftheday() - last_meal_time;
+    if (time_since_last_meal > time_to_die)
+        philo->data->someone_die = 1;
+    printf("%i philo died", philo->id);
+}
+
 int main(int ac, char **av)
 {
     t_data  *data;
@@ -98,8 +108,12 @@ int main(int ac, char **av)
     {
         if (pthread_create(&philo[i].tid, NULL, thread_routine_funtion, &philo[i]))
             return(printf("threading failed"), 1);
+        monitor(philo);
+        if (data->someone_die == 1)
+            break ;
         i++;
     }
+
     i = 0;
     while(data->no_of_philo > i)
     {
