@@ -8,12 +8,13 @@ int ft_atoi(const char *str);
 
 typedef struct s_data{
 
-    int no_of_philo;
-    int time_to_die;
-    int time_to_eat;
-    int time_to_sleep;
-    int no_of_times_each_philo_must_eat;
-    int someone_die;
+    int             no_of_philo;
+    int             time_to_die;
+    int             time_to_eat;
+    int             time_to_sleep;
+    int             no_of_times_each_philo_must_eat;
+    int             someone_die;
+    long long       start_time;
     pthread_mutex_t *fork;
 }   t_data;
 
@@ -50,7 +51,6 @@ void ft_usleep(long long time_in_ms)
         usleep(500);
         currenttime = gettimeoftheday();
     }
-    printf("executed");
 }
 
 void init_data(t_data *data, int ac, char **av)
@@ -63,6 +63,7 @@ void init_data(t_data *data, int ac, char **av)
     data->no_of_times_each_philo_must_eat = -1;
     if (ac == 6)
         data->no_of_times_each_philo_must_eat = ft_atoi(av[5]);
+    data->start_time = gettimeoftheday();
     data->someone_die = 0;
     data->fork = malloc(sizeof(pthread_mutex_t)*data->no_of_philo);
     if (!data->fork)
@@ -87,12 +88,60 @@ void init_philos(t_philo *philo, t_data *data)
     }
 }
 
+void time_to_eat(t_data *data, t_philo *philo)
+{
+    int i = 0;
+    long long time;
+
+    time = gettimeoftheday() - data->start_time;
+    while (1)
+    {
+        if (pthread_mutex_lock(philo->left_mutex) != 0)
+        {
+            printf("locking failed");
+               return ;
+        }
+
+        printf("%lld %i philo has taken the fork\n", gettimeoftheday() - data->start_time, philo->id);
+        
+        if (pthread_mutex_lock(philo->right_mutex) != 0)
+        {
+            printf("locking failed");
+            return ;
+        }
+
+        printf("%lld %i philo is eating\n", gettimeoftheday() - data->start_time,  philo->id);
+        philo->last_meal_time = gettimeoftheday();
+        ft_usleep(data->time_to_eat);
+        
+        if (pthread_mutex_unlock(philo->left_mutex) != 0)
+        {
+            printf("locking failed");
+            return ;
+        }
+        if (pthread_mutex_unlock(philo->right_mutex) != 0)
+        {
+            printf("locking failed");
+            return ;
+        }
+        
+        printf("%lld %i philo is sleeping\n", gettimeoftheday() - data->start_time,  philo->id);
+        
+        ft_usleep(data->time_to_sleep);
+
+        printf("%lld %i philo is thinking\n", gettimeoftheday() - data->start_time,  philo->id);
+    }
+}
+
 void *thread_routine_funtion(void *arg)
 {
     t_philo *my_philo_data;
     
+    if (my_philo_data->id % 2 == 0)
+        ft_usleep(1);
+
     my_philo_data = (t_philo *)arg;
-    printf("i am philosopher number %i\n", my_philo_data->id);
+    time_to_eat(my_philo_data->data, my_philo_data);
     return NULL;
 }
 
