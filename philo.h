@@ -31,6 +31,7 @@ typedef struct s_philo{
     struct s_data   *data;
 }      t_philo;
 
+int	ft_atoi(const char *str);
 long long gettimeoftheday(void);
 void ft_usleep(long long time_in_ms);
 void init_data(t_data *data, int ac, char **av);
@@ -38,6 +39,7 @@ void init_philos(t_philo *philo, t_data *data);
 void print_action(t_philo *philo, char *str);
 void time_to_eat(t_data *data, t_philo *philo);
 void *thread_routine_funtion(void *arg);
+void monitor(t_philo *philo);
 int main(int ac, char **av);
 
 

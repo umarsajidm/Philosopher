@@ -37,8 +37,6 @@ long long gettimeoftheday(void)
 
 void ft_usleep(long long time_in_ms)
 {
-    struct timeval tv;
-
     long long starttime =gettimeoftheday();
 
     long long currenttime = gettimeoftheday();

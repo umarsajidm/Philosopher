@@ -45,7 +45,7 @@ void print_action(t_philo *philo, char *str)
 
 void time_to_eat(t_data *data, t_philo *philo)
 {
-    int i = 0;
+    // int i = 0;
     
     while (1)
     {
@@ -72,23 +72,42 @@ void *thread_routine_funtion(void *arg)
 {
     t_philo *my_philo_data;
     
+
+    my_philo_data = (t_philo *)arg;
     if (my_philo_data->id % 2 == 0)
         ft_usleep(1);
 
-    my_philo_data = (t_philo *)arg;
     time_to_eat(my_philo_data->data, my_philo_data);
     return NULL;
 }
 
+
+
 void monitor(t_philo *philo)
 {
     long long time_since_last_meal;
+    int i;
 
-    time_since_last_meal = gettimeoftheday() - last_meal_time;
-    if (time_since_last_meal > time_to_die)
-        philo->data->someone_die = 1;
-    printf("%i philo died", philo->id);
+    while(1)
+        {
+            i = 0;
+            while (i < philo->data->no_of_philo)
+            {
+                time_since_last_meal = gettimeoftheday() - philo->last_meal_time;
+
+                if (time_since_last_meal > philo->data->time_to_die)
+                {
+                    printf("%i philo died\n", philo[i].id);
+                    philo[i].data->someone_die = 1;
+                    return ;
+                }
+                i++;
+            }
+            usleep(100);
+        }
+    return;
 }
+
 
 int main(int ac, char **av)
 {
@@ -108,12 +127,11 @@ int main(int ac, char **av)
     {
         if (pthread_create(&philo[i].tid, NULL, thread_routine_funtion, &philo[i]))
             return(printf("threading failed"), 1);
-        monitor(philo);
         if (data->someone_die == 1)
             break ;
         i++;
     }
-
+    monitor(philo);
     i = 0;
     while(data->no_of_philo > i)
     {
