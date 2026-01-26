@@ -30,7 +30,9 @@ void init_philos(t_philo *philo, t_data *data)
         philo[i].id = i + 1;
         philo[i].left_mutex = &data->fork[i];
         philo[i].right_mutex = &data->fork[(i + 1) % data->no_of_philo];
+        philo[i].last_meal_time = data->start_time;
         philo[i].data = data;
+        philo[i].meals_eaten = 0;
         i++;
     }
 }
@@ -49,6 +51,8 @@ void time_to_eat(t_data *data, t_philo *philo)
     
     while (1)
     {
+        if (data->someone_die == 1)
+            break;
         pthread_mutex_lock(philo->left_mutex);
         print_action(philo, "philo is taking a fork");
         
@@ -93,9 +97,9 @@ void monitor(t_philo *philo)
             i = 0;
             while (i < philo->data->no_of_philo)
             {
-                time_since_last_meal = gettimeoftheday() - philo->last_meal_time;
+                time_since_last_meal = gettimeoftheday() - philo[i].last_meal_time;
 
-                if (time_since_last_meal > philo->data->time_to_die)
+                if (time_since_last_meal > philo[i].data->time_to_die)
                 {
                     printf("%i philo died\n", philo[i].id);
                     philo[i].data->someone_die = 1;
