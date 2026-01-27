@@ -97,14 +97,20 @@ void time_to_eat(t_data *data, t_philo *philo)
 
 void *thread_routine_funtion(void *arg)
 {
-    t_philo *my_philo_data;
+    t_philo *philo = (t_philo *)arg;
     
+    if (philo->data->no_of_philo == 1)
+    {
+        pthread_mutex_lock(philo->left_mutex);
+        print_action(philo, "has taken a fork");
+        ft_usleep(philo->data->time_to_die); 
+        pthread_mutex_unlock(philo->left_mutex);
+        return NULL;
+    }
 
-    my_philo_data = (t_philo *)arg;
-    if (my_philo_data->id % 2 == 0)
+    if (philo->id % 2 == 0)
         ft_usleep(1);
-
-    time_to_eat(my_philo_data->data, my_philo_data);
+    time_to_eat(philo->data, philo);
     return NULL;
 }
 
