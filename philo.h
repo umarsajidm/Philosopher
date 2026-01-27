@@ -19,6 +19,9 @@ typedef struct s_data{
     int             someone_die;
     long long       start_time;
     pthread_mutex_t *fork;
+    pthread_mutex_t dead_lock;
+    pthread_mutex_t meal_lock;
+    pthread_mutex_t write_lock;
 }   t_data;
 
 typedef struct s_philo{
