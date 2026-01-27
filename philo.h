@@ -42,6 +42,7 @@ void init_philos(t_philo *philo, t_data *data);
 void print_action(t_philo *philo, char *str);
 void time_to_eat(t_data *data, t_philo *philo);
 void *thread_routine_funtion(void *arg);
+int check_if_all_ate(t_philo *philo);
 void monitor(t_philo *philo);
 int main(int ac, char **av);
 

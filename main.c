@@ -80,6 +80,7 @@ void time_to_eat(t_data *data, t_philo *philo)
 
         pthread_mutex_lock(&philo->data->meal_lock);
         philo->last_meal_time = gettimeoftheday();
+        philo->meals_eaten++;
         pthread_mutex_unlock(&philo->data->meal_lock);
         
 
@@ -98,7 +99,7 @@ void time_to_eat(t_data *data, t_philo *philo)
 void *thread_routine_funtion(void *arg)
 {
     t_philo *philo = (t_philo *)arg;
-    
+
     if (philo->data->no_of_philo == 1)
     {
         pthread_mutex_lock(philo->left_mutex);
@@ -113,7 +114,32 @@ void *thread_routine_funtion(void *arg)
     time_to_eat(philo->data, philo);
     return NULL;
 }
+int check_if_all_ate(t_philo *philo)
+{
+    int i;
+    int finished_eating;
 
+    i = 0;
+    finished_eating = 0;
+    if (philo->data->no_of_times_each_philo_must_eat == -1)
+        return (0);
+    while (i < philo->data->no_of_philo)
+    {
+        pthread_mutex_lock(&philo->data->meal_lock);
+        if (philo[i].meals_eaten >= philo->data->no_of_times_each_philo_must_eat)
+            finished_eating++;
+        pthread_mutex_unlock(&philo->data->meal_lock);
+        i++;
+    }
+    if (finished_eating == philo->data->no_of_philo)
+    {
+        pthread_mutex_lock(&philo->data->dead_lock);
+        philo->data->someone_die = 1;
+        pthread_mutex_unlock(&philo->data->dead_lock);
+        return (1);
+    }
+    return (0);
+}
 
 
 void monitor(t_philo *philo)
@@ -151,6 +177,8 @@ void monitor(t_philo *philo)
                 }
                 i++;
             }
+            if (check_if_all_ate(philo) == 1)
+                return ;
             usleep(500);
         }
     return;
