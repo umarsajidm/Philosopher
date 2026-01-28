@@ -3,6 +3,7 @@
 void init_data(t_data *data, int ac, char **av)
 {
     int i = 0;
+    data->start_time = gettimeoftheday();
     data->no_of_philo = ft_atoi(av[1]);
     data->time_to_die = ft_atoi(av[2]);
     data->time_to_eat = ft_atoi(av[3]);
@@ -10,7 +11,6 @@ void init_data(t_data *data, int ac, char **av)
     data->no_of_times_each_philo_must_eat = -1;
     if (ac == 6)
         data->no_of_times_each_philo_must_eat = ft_atoi(av[5]);
-    data->start_time = gettimeoftheday();
     data->someone_die = 0;
     data->fork = malloc(sizeof(pthread_mutex_t)*data->no_of_philo);
     if (!data->fork)
@@ -52,6 +52,13 @@ void print_action(t_philo *philo, char *str)
 {
     long long time;
 
+    pthread_mutex_lock(&philo->data->dead_lock);
+    if (philo->data->someone_die == 1)
+    {
+        pthread_mutex_unlock(&philo->data->dead_lock);
+        return ;
+    }
+    pthread_mutex_unlock(&philo->data->dead_lock);
     time = gettimeoftheday() - philo->data->start_time;
     pthread_mutex_lock(&philo->data->write_lock);
     printf("%lld %i %s\n", time, philo->id, str);
@@ -110,7 +117,7 @@ void *thread_routine_funtion(void *arg)
     }
 
     if (philo->id % 2 == 0)
-        ft_usleep(1);
+        usleep(1000);
     time_to_eat(philo->data, philo);
     return NULL;
 }
