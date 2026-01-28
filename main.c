@@ -179,7 +179,7 @@ void monitor(t_philo *philo)
             }
             if (check_if_all_ate(philo) == 1)
                 return ;
-            usleep(500);
+            //usleep(500);
         }
     return;
 }
