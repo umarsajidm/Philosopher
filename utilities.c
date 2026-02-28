@@ -37,14 +37,11 @@ long long gettimeoftheday(void)
 
 void ft_usleep(long long time_in_ms)
 {
-    long long starttime =gettimeoftheday();
+    long long starttime = gettimeoftheday();
 
-    long long currenttime = gettimeoftheday();
-
-    while ((currenttime - starttime) < time_in_ms)
+    while ((gettimeoftheday() - starttime) < time_in_ms)
     {
-        usleep(500);
-        currenttime = gettimeoftheday();
+        usleep(100);
     }
 }
 
