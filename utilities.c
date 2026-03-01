@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utilities.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mumar <mumar@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 00:00:00 by mumar             #+#    #+#             */
+/*   Updated: 2026/03/01 00:00:00 by mumar            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 int	ft_atoi(const char *str)
@@ -26,22 +38,23 @@ int	ft_atoi(const char *str)
 	return (sum);
 }
 
-
-long long gettimeoftheday(void)
+long long	gettimeoftheday(void)
 {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    long long time_in_ms = (long long)tv.tv_sec * 1000 + (long long)tv.tv_usec/1000;
-    return (time_in_ms);
+	struct timeval	tv;
+	long long		time_in_ms;
+
+	gettimeofday(&tv, NULL);
+	time_in_ms = (long long)tv.tv_sec * 1000 + (long long)tv.tv_usec / 1000;
+	return (time_in_ms);
 }
 
-void ft_usleep(long long time_in_ms)
+void	ft_usleep(long long time_in_ms)
 {
-    long long starttime = gettimeoftheday();
+	long long	starttime;
 
-    while ((gettimeoftheday() - starttime) < time_in_ms)
-    {
-        usleep(100);
-    }
+	starttime = gettimeoftheday();
+	while ((gettimeoftheday() - starttime) < time_in_ms)
+	{
+		usleep(100);
+	}
 }
-
