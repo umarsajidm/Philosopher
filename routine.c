@@ -1,23 +1,5 @@
 #include "philo.h"
 
-void	print_action(t_philo *philo, char *str)
-{
-	long long	time;
-
-	pthread_mutex_lock(&philo->data->write_lock);
-	pthread_mutex_lock(&philo->data->dead_lock);
-	if (philo->data->someone_die == 1)
-	{
-		pthread_mutex_unlock(&philo->data->dead_lock);
-		pthread_mutex_unlock(&philo->data->write_lock);
-		return ;
-	}
-	pthread_mutex_unlock(&philo->data->dead_lock);
-	time = gettimeoftheday() - philo->data->start_time;
-	printf("%lld %i %s\n", time, philo->id, str);
-	pthread_mutex_unlock(&philo->data->write_lock);
-}
-
 int	check_dead_flag(t_data *data)
 {
 	pthread_mutex_lock(&data->dead_lock);
@@ -30,46 +12,59 @@ int	check_dead_flag(t_data *data)
 	return (0);
 }
 
-void	philo_eats(t_philo *philo)
+void	wait_for_gate(t_philo *philo)
 {
-	pthread_mutex_lock(philo->left_mutex);
-	print_action(philo, "has taken a fork");
-	pthread_mutex_lock(philo->right_mutex);
-	print_action(philo, "has taken a fork");
-	print_action(philo, "is eating");
-	pthread_mutex_lock(&philo->data->meal_lock);
-	philo->last_meal_time = gettimeoftheday();
-	philo->meals_eaten++;
-	pthread_mutex_unlock(&philo->data->meal_lock);
-	ft_usleep(philo->data->time_to_eat);
-	pthread_mutex_unlock(philo->left_mutex);
-	pthread_mutex_unlock(philo->right_mutex);
+	while (1)
+	{
+		pthread_mutex_lock(&philo->data->dead_lock);
+		if (philo->data->simulation_ready == 1)
+		{
+			pthread_mutex_unlock(&philo->data->dead_lock);
+			break ;
+		}
+		pthread_mutex_unlock(&philo->data->dead_lock);
+		usleep(500);
+	}
+}
+
+// THE FIX: Removed the math drift. Just a 1ms system yield to desync.
+void	philo_think(t_data *data, t_philo *philo)
+{
+	print_action(philo, "is thinking");
+	if (data->no_of_philo % 2 != 0)
+		usleep(1000); 
 }
 
 void	time_to_eat(t_data *data, t_philo *philo)
 {
-	while (1)
+	while (!check_dead_flag(data))
 	{
-		if (check_dead_flag(data))
-			break ;
-		philo_eats(philo);
+		pthread_mutex_lock(philo->left_mutex);
+		print_action(philo, "has taken a fork");
+		pthread_mutex_lock(philo->right_mutex);
+		print_action(philo, "has taken a fork");
+		print_action(philo, "is eating");
+		pthread_mutex_lock(&data->meal_lock);
+		philo->last_meal_time = gettimeoftheday();
+		philo->meals_eaten++;
+		pthread_mutex_unlock(&data->meal_lock);
+		ft_usleep(data->time_to_eat);
+		pthread_mutex_unlock(philo->left_mutex);
+		pthread_mutex_unlock(philo->right_mutex);
 		if (check_dead_flag(data))
 			break ;
 		print_action(philo, "is sleeping");
 		ft_usleep(data->time_to_sleep);
-		print_action(philo, "is thinking");
-		if (data->no_of_philo % 2 != 0)
-			ft_usleep(2);
-		else
-			ft_usleep(1);
+		philo_think(data, philo);
 	}
 }
 
-void	*thread_routine_funtion(void *arg)
+void	*thread_routine(void *arg)
 {
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
+	wait_for_gate(philo);
 	if (philo->data->no_of_philo == 1)
 	{
 		pthread_mutex_lock(philo->left_mutex);
@@ -79,7 +74,7 @@ void	*thread_routine_funtion(void *arg)
 		return (NULL);
 	}
 	if (philo->id % 2 == 0)
-		ft_usleep(20);
+		ft_usleep(1);
 	time_to_eat(philo->data, philo);
 	return (NULL);
 }

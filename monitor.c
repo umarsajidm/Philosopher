@@ -25,21 +25,21 @@ int	check_philo_death(t_philo *philo, int i)
 int	check_all_ate(t_philo *philo)
 {
 	int	i;
-	int	finished_eating;
+	int	finished;
 
 	i = 0;
-	finished_eating = 0;
+	finished = 0;
 	if (philo->data->no_of_times_each_philo_must_eat == -1)
 		return (0);
 	while (i < philo->data->no_of_philo)
 	{
 		pthread_mutex_lock(&philo->data->meal_lock);
 		if (philo[i].meals_eaten >= philo->data->no_of_times_each_philo_must_eat)
-			finished_eating++;
+			finished++;
 		pthread_mutex_unlock(&philo->data->meal_lock);
 		i++;
 	}
-	if (finished_eating == philo->data->no_of_philo)
+	if (finished == philo->data->no_of_philo)
 	{
 		pthread_mutex_lock(&philo->data->dead_lock);
 		philo->data->someone_die = 1;

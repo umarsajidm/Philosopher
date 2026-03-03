@@ -1,24 +1,32 @@
 #include "philo.h"
 
-int	start_simulation(t_data *data, t_philo *philo)
+void	start_simulation(t_data *data, t_philo *philo)
 {
 	int	i;
 
 	i = 0;
-	data->start_time = gettimeoftheday();
 	while (i < data->no_of_philo)
 	{
-		philo[i].last_meal_time = data->start_time;
-		if (pthread_create(&philo[i].tid, NULL,
-				thread_routine_funtion, &philo[i]))
-			return (printf("threading failed\n"), 1);
+		if (pthread_create(&philo[i].tid, NULL, thread_routine, &philo[i]))
+			return ;
 		i++;
 	}
-	monitor(philo);
+	pthread_mutex_lock(&data->dead_lock);
+	data->start_time = gettimeoftheday();
 	i = 0;
 	while (i < data->no_of_philo)
-		pthread_join(philo[i++].tid, NULL);
-	return (0);
+	{
+		pthread_mutex_lock(&data->meal_lock);
+		philo[i].last_meal_time = data->start_time;
+		pthread_mutex_unlock(&data->meal_lock);
+		i++;
+	}
+	data->simulation_ready = 1;
+	pthread_mutex_unlock(&data->dead_lock);
+	monitor(philo);
+	i = -1;
+	while (++i < data->no_of_philo)
+		pthread_join(philo[i].tid, NULL);
 }
 
 void	cleanup_philo(t_data *data, t_philo *philo)
@@ -47,9 +55,11 @@ int	main(int ac, char **av)
 	if (!data)
 		return (printf("data allocation failed\n"), 1);
 	init_data(data, ac, av);
+	if (!data->fork)
+		return (free(data), 1);
 	philo = malloc(sizeof(t_philo) * data->no_of_philo);
 	if (!philo)
-		return (printf("philo allocation failed\n"), 1);
+		return (free(data->fork), free(data), 1);
 	init_philos(philo, data);
 	start_simulation(data, philo);
 	cleanup_philo(data, philo);

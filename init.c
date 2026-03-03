@@ -13,6 +13,7 @@ void	init_data(t_data *data, int ac, char **av)
 	if (ac == 6)
 		data->no_of_times_each_philo_must_eat = ft_atoi(av[5]);
 	data->someone_die = 0;
+	data->simulation_ready = 0;
 	data->fork = malloc(sizeof(pthread_mutex_t) * data->no_of_philo);
 	if (!data->fork)
 		return ;
@@ -33,8 +34,16 @@ void	init_philos(t_philo *philo, t_data *data)
 		philo[i].data = data;
 		philo[i].id = i + 1;
 		philo[i].meals_eaten = 0;
-		philo[i].left_mutex = &data->fork[i];
-		philo[i].right_mutex = &data->fork[(i + 1) % data->no_of_philo];
+		if (i % 2 == 0)
+		{
+			philo[i].left_mutex = &data->fork[i];
+			philo[i].right_mutex = &data->fork[(i + 1) % data->no_of_philo];
+		}
+		else
+		{
+			philo[i].left_mutex = &data->fork[(i + 1) % data->no_of_philo];
+			philo[i].right_mutex = &data->fork[i];
+		}
 		i++;
 	}
 }
