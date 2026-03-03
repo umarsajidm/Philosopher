@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mumar <mumar@student.42.fr>                +#+  +:+       +#+        */
+/*   By: musajid <musajid@hive.student.fi>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/01 00:00:00 by mumar             #+#    #+#             */
-/*   Updated: 2026/03/01 00:00:00 by mumar            ###   ########.fr       */
+/*   Updated: 2026/03/03 09:14:54 by musajid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,16 +45,29 @@ typedef struct s_philo
 	struct s_data	*data;
 }	t_philo;
 
+// Utils
 int			ft_atoi(const char *str);
 long long	gettimeoftheday(void);
 void		ft_usleep(long long time_in_ms);
+void		print_action(t_philo *philo, char *str);
+
+// Init
 void		init_data(t_data *data, int ac, char **av);
 void		init_philos(t_philo *philo, t_data *data);
-void		print_action(t_philo *philo, char *str);
+
+// Routine
+int			check_dead_flag(t_data *data);
+void		philo_eats(t_philo *philo);
 void		time_to_eat(t_data *data, t_philo *philo);
 void		*thread_routine_funtion(void *arg);
-int			check_if_all_ate(t_philo *philo);
+
+// Monitor
+int			check_philo_death(t_philo *philo, int i);
+int			check_all_ate(t_philo *philo);
 void		monitor(t_philo *philo);
-int			main(int ac, char **av);
+
+// Simulation / Cleanup
+int			start_simulation(t_data *data, t_philo *philo);
+void		cleanup_philo(t_data *data, t_philo *philo);
 
 #endif

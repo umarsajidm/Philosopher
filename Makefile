@@ -3,7 +3,7 @@ CC          = cc
 CFLAGS      = -Wall -Wextra -Werror
 PTHREAD     = -pthread
 
-SRCS        = main.c utilities.c
+SRCS        = main.c utilities.c init.c monitor.c routine.c
 OBJS        = $(SRCS:.c=.o)
 
 all: $(NAME)
