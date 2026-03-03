@@ -44,16 +44,42 @@ void	cleanup_philo(t_data *data, t_philo *philo)
 	free(data);
 }
 
+int	check_args(int ac, char **av)
+{
+	int	i;
+	int	j;
+
+	i = 1;
+	while (i < ac)
+	{
+		j = 0;
+		if (!av[i][0])
+			return (1);
+		while (av[i][j])
+		{
+			if (av[i][j] < '0' || av[i][j] > '9')
+				return (1);
+			j++;
+		}
+		i++;
+	}
+	if (ft_atoi(av[1]) <= 0)
+		return (1);
+	return (0);
+}
+
 int	main(int ac, char **av)
 {
 	t_data	*data;
 	t_philo	*philo;
 
 	if (ac < 5 || ac > 6)
-		return (1);
+		return (printf("Error: Wrong number of arguments\n"), 1);
+	if (check_args(ac, av))
+		return (printf("Error: Invalid arguments\n"), 1);
 	data = malloc(sizeof(t_data));
 	if (!data)
-		return (printf("data allocation failed\n"), 1);
+		return (printf("Error: data allocation failed\n"), 1);
 	init_data(data, ac, av);
 	if (!data->fork)
 		return (free(data), 1);

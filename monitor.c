@@ -10,13 +10,13 @@ int	check_philo_death(t_philo *philo, int i)
 	pthread_mutex_unlock(&philo->data->meal_lock);
 	if (time_since_meal > philo->data->time_to_die)
 	{
+		pthread_mutex_lock(&philo->data->dead_lock);
+		philo->data->someone_die = 1;
+		pthread_mutex_unlock(&philo->data->dead_lock);
 		pthread_mutex_lock(&philo->data->write_lock);
 		time = gettimeoftheday() - philo->data->start_time;
 		printf("%lld %i died\n", time, philo[i].id);
 		pthread_mutex_unlock(&philo->data->write_lock);
-		pthread_mutex_lock(&philo->data->dead_lock);
-		philo->data->someone_die = 1;
-		pthread_mutex_unlock(&philo->data->dead_lock);
 		return (1);
 	}
 	return (0);
