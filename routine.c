@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   routine.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: musajid <musajid@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/09 10:27:18 by musajid           #+#    #+#             */
+/*   Updated: 2026/03/09 10:27:18 by musajid          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 int	check_dead_flag(t_data *data)
@@ -27,12 +39,11 @@ void	wait_for_gate(t_philo *philo)
 	}
 }
 
-// THE FIX: Removed the math drift. Just a 1ms system yield to desync.
 void	philo_think(t_data *data, t_philo *philo)
 {
 	print_action(philo, "is thinking");
 	if (data->no_of_philo % 2 != 0)
-		usleep(1000); 
+		usleep(1000);
 }
 
 void	time_to_eat(t_data *data, t_philo *philo)
