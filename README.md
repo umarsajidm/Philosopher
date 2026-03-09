@@ -15,9 +15,13 @@ This project introduces practical concepts of **multithreading**, **synchronizat
 ---
 
 ## Instructions
-
 ### Compilation
 Run the following command to compile the project:
 
 ```bash
 make
+```
+---
+## Resources
+Several Blog posts related to concurrency, youtube videos and AI for general instructions on how to approach the project and test cases and minor adjustments
+
